@@ -40,7 +40,7 @@ class Body():
 
         return self.r, self.v
     
-    def getPosition(self):
+    def getPosition(self, format="normal"):
         return self.r
 
     def getVelocity(self):
@@ -57,10 +57,13 @@ class smallBody(Body):
         return
 
 class largeBody(Body):
-    def __init__(ID, mass, position, velocity):
+    def __init__(self, ID, mass, position, velocity):
         """
         A largeBody moves on 'rails'.
         """
         super().__init__(ID, mass, position, velocity)
         return 
+
+    def updatePosition(self, timeStep):
+        return self.r, self.v
 
