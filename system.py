@@ -6,8 +6,14 @@ import body
 
 
 class System():
-    def __init__(self, largeBodyList, smallBodyList, timeStep):
-        self.largeBodyList = largeBodyList
+    def __init__(self, largeBodyFile, smallBodyList, timeStep):
+
+        #create the large bodies from the text file
+        self.largeBodyList = []
+        largeBodyData = np.loadtxt(largeBodyFile, skiprows=1)
+
+
+
         self.smallBodyList = smallBodyList
         self.timeStep = timeStep
 
@@ -21,6 +27,9 @@ class System():
         counter = 0
 
         while counter < N:
+
+            for body in self.largeBodyList:
+                self.positionHistories[body.ID].append(body.updatePosition(self.timeStep))
                 
             for body in self.smallBodyList:
                 self.positionHistories[body.ID].append(body.updatePosition(self.largeBodyList, self.timeStep)[0])
