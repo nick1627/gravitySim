@@ -57,13 +57,28 @@ class smallBody(Body):
         return
 
 class largeBody(Body):
-    def __init__(self, ID, mass, position, velocity):
+    def __init__(self, ID, bodyName, bodyParent, mass, radius, eccentricity, semimajorAxis, inclination, longAscNode, argPeriapsis, meanAnomaly):
         """
-        A largeBody moves on 'rails'.
+        A largeBody moves on 'rails'.  For this, we do not need the state vector,
+        just the Keplerian orbital elements.
         """
-        super().__init__(ID, mass, position, velocity)
+        # super().__init__(ID, mass, position, velocity)
+        #body parameters
+        self.ID = ID
+        self.name = bodyName
+        self.parent = bodyParent
+        self.m = mass
+        self.r = radius
+        #orbital parameters
+        self.e = eccentricity
+        self.a = semimajorAxis
+        self.inc = inclination
+        self.longAN = longAscNode
+        self.argPer = argPeriapsis
+        self.meanAnom = meanAnomaly
+
         return 
 
-    def updatePosition(self, timeStep):
+    def updatePosition(self, absoluteTime):
         return self.r, self.v
 
