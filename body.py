@@ -69,6 +69,8 @@ class largeBody(Body):
         self.parent = bodyParent
         self.m = mass
         self.r = radius
+
+        self.GM = sp.constants.G*self.bodyParent.m
         #orbital parameters
         self.e = eccentricity
         self.a = semimajorAxis
@@ -79,9 +81,10 @@ class largeBody(Body):
 
         #Compute some useful values for later.  See "Position as a function of time"
         #on wikipedia: https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Position_as_a_function_of_time
-        self.T = 0 #compute the period somehow
-        
-        self.n = 2*np.pi/T
+        #compute the period using Kepler's third law
+        self.T = 2*np.pi*np.sqrt(self.a**3/self.GM)
+        #now compute mean motion (mean angle per unit time)
+        self.n = 2*np.pi/self.T
 
 
         return 
@@ -101,13 +104,18 @@ class largeBody(Body):
     def getPosition(self, t):
         #t is the time since the beginning of the simulation
         currentMeanAnom = self.n*t + self.meanAnom
-
         #calculate eccentric anomaly E
         E = sp.optimize.newton(self.keplersEquation, np.pi/4, self.keplersDerivative, args=(currentMeanAnom, self.e))
         #calculate the true anomaly theta
-        #TODO calculate this
+        theta = 2*np.sqrt((1+self.e)/(1-self.e))*np.tan(E/2)
         #calculate the heliocentric distance r
         r = self.a*(1-self.e*np.cos(E))
+        #Now we have r and theta.  Need to convert this to a cartesian vector,
+        #then convert that into the desired frame using the rest of the 
+        #orbital elements.
+        pos = np.array([r*np.cos(theta), r*np.sin(theta), 0])
+
+
 
 
         return self.r, self.v
