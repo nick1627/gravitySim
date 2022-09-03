@@ -72,13 +72,43 @@ class largeBody(Body):
         #orbital parameters
         self.e = eccentricity
         self.a = semimajorAxis
-        self.inc = inclination
-        self.longAN = longAscNode
+        self.inc = np.deg2rad(inclination) #these two are stored as degrees
+        self.longAN = np.deg2rad(longAscNode) #because thats what ksp does in the wiki
         self.argPer = argPeriapsis
         self.meanAnom = meanAnomaly
 
+        #Compute some useful values for later.  See "Position as a function of time"
+        #on wikipedia: https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Position_as_a_function_of_time
+        self.T = 0 #compute the period somehow
+        
+        self.n = 2*np.pi/T
+
+
         return 
 
-    def updatePosition(self, absoluteTime):
+    
+    def keplersEquation(E, M, epsilon):
+        #This is Kepler's equation (rearranged)
+        # See https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Position_as_a_function_of_time
+        return M - epsilon*np.sin(E)
+
+    def keplersDerivative(E, M, epsilon):
+        #derivative of Kepler's equation
+        return -epsilon*np.cos(E)
+
+    
+
+    def getPosition(self, t):
+        #t is the time since the beginning of the simulation
+        currentMeanAnom = self.n*t + self.meanAnom
+
+        #calculate eccentric anomaly E
+        E = sp.optimize.newton(self.keplersEquation, np.pi/4, self.keplersDerivative, args=(currentMeanAnom, self.e))
+        #calculate the true anomaly theta
+        #TODO calculate this
+        #calculate the heliocentric distance r
+        r = self.a*(1-self.e*np.cos(E))
+
+
         return self.r, self.v
 
