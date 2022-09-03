@@ -74,7 +74,7 @@ class largeBody(Body):
         #orbital parameters
         self.e = eccentricity
         self.a = semimajorAxis
-        self.inc = np.deg2rad(inclination) #these two are stored as degrees
+        self.i = np.deg2rad(inclination) #these two are stored as degrees
         self.longAN = np.deg2rad(longAscNode) #because thats what ksp does in the wiki
         self.argPer = argPeriapsis
         self.meanAnom = meanAnomaly
@@ -86,6 +86,13 @@ class largeBody(Body):
         #now compute mean motion (mean angle per unit time)
         self.n = 2*np.pi/self.T
 
+        #Here is a good place to calculate the transformation matrices too
+        longANMatrix = np.array([[np.cos(self.longAN), -np.sin(self.longAN), 0], [np.sin(self.longAN), np.cos(self.longAN), 0], [0, 0, 1]])
+        inclinationMatrix = np.array([[1, 0, 0], [0, np.cos(self.i), -np.sin(self.i)], [0, np.sin(self.i), np.cos(self.i)]])
+        argPeriapsisMatrix = np.array([[np.cos(self.argPer), -np.sin(self.argPer), 0], [np.sin(self.argPer), np.cos(self.argPer), 0], [0, 0, 1]])
+        
+        self.transfMatrix = np.matmul(longANMatrix, np.matmul(inclinationMatrix, argPeriapsisMatrix))
+        self.invTransfMatrix = np.linalg.inv(self.transfMatrix)
 
         return 
 
@@ -113,10 +120,9 @@ class largeBody(Body):
         #Now we have r and theta.  Need to convert this to a cartesian vector,
         #then convert that into the desired frame using the rest of the 
         #orbital elements.
-        pos = np.array([r*np.cos(theta), r*np.sin(theta), 0])
+        position = np.array([r*np.cos(theta), r*np.sin(theta), 0])
+        #use inverse transformation matrix to convert to inertial frame
+        position = np.matmul(self.invTransfMatrix, position)
 
-
-
-
-        return self.r, self.v
+        return position
 
