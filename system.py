@@ -10,7 +10,13 @@ class System():
 
         #create the large bodies from the text file
         self.largeBodyList = []
+        #get all the planet data as strings
         largeBodyData = np.loadtxt(largeBodyFile, skiprows=1)
+
+
+        for row in range(len(largeBodyData)):
+            #TODO FINSIH ME!
+            self.largeBodyList.append(body.largeBody(row, largeBodyData[row, 0], largeBodyData[row, 1]))
 
 
 

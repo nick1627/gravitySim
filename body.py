@@ -70,7 +70,7 @@ class largeBody(Body):
         self.m = mass
         self.r = radius
 
-        self.GM = sp.constants.G*self.bodyParent.m
+        
         #orbital parameters
         self.e = eccentricity
         self.a = semimajorAxis
@@ -79,20 +79,22 @@ class largeBody(Body):
         self.argPer = argPeriapsis
         self.meanAnom = meanAnomaly
 
-        #Compute some useful values for later.  See "Position as a function of time"
-        #on wikipedia: https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Position_as_a_function_of_time
-        #compute the period using Kepler's third law
-        self.T = 2*np.pi*np.sqrt(self.a**3/self.GM)
-        #now compute mean motion (mean angle per unit time)
-        self.n = 2*np.pi/self.T
+        if not self.parent == "na":
+            #Compute some useful values for later.  See "Position as a function of time"
+            #on wikipedia: https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Position_as_a_function_of_time
+            self.GM = sp.constants.G*self.bodyParent.m
+            #compute the period using Kepler's third law
+            self.T = 2*np.pi*np.sqrt(self.a**3/self.GM)
+            #now compute mean motion (mean angle per unit time)
+            self.n = 2*np.pi/self.T
 
-        #Here is a good place to calculate the transformation matrices too
-        longANMatrix = np.array([[np.cos(self.longAN), -np.sin(self.longAN), 0], [np.sin(self.longAN), np.cos(self.longAN), 0], [0, 0, 1]])
-        inclinationMatrix = np.array([[1, 0, 0], [0, np.cos(self.i), -np.sin(self.i)], [0, np.sin(self.i), np.cos(self.i)]])
-        argPeriapsisMatrix = np.array([[np.cos(self.argPer), -np.sin(self.argPer), 0], [np.sin(self.argPer), np.cos(self.argPer), 0], [0, 0, 1]])
-        
-        self.transfMatrix = np.matmul(longANMatrix, np.matmul(inclinationMatrix, argPeriapsisMatrix))
-        self.invTransfMatrix = np.linalg.inv(self.transfMatrix)
+            #Here is a good place to calculate the transformation matrices too
+            longANMatrix = np.array([[np.cos(self.longAN), -np.sin(self.longAN), 0], [np.sin(self.longAN), np.cos(self.longAN), 0], [0, 0, 1]])
+            inclinationMatrix = np.array([[1, 0, 0], [0, np.cos(self.i), -np.sin(self.i)], [0, np.sin(self.i), np.cos(self.i)]])
+            argPeriapsisMatrix = np.array([[np.cos(self.argPer), -np.sin(self.argPer), 0], [np.sin(self.argPer), np.cos(self.argPer), 0], [0, 0, 1]])
+            
+            self.transfMatrix = np.matmul(longANMatrix, np.matmul(inclinationMatrix, argPeriapsisMatrix))
+            self.invTransfMatrix = np.linalg.inv(self.transfMatrix)
 
         return 
 
@@ -109,20 +111,24 @@ class largeBody(Body):
     
 
     def getPosition(self, t):
-        #t is the time since the beginning of the simulation
-        currentMeanAnom = self.n*t + self.meanAnom
-        #calculate eccentric anomaly E
-        E = sp.optimize.newton(self.keplersEquation, np.pi/4, self.keplersDerivative, args=(currentMeanAnom, self.e))
-        #calculate the true anomaly theta
-        theta = 2*np.sqrt((1+self.e)/(1-self.e))*np.tan(E/2)
-        #calculate the heliocentric distance r
-        r = self.a*(1-self.e*np.cos(E))
-        #Now we have r and theta.  Need to convert this to a cartesian vector,
-        #then convert that into the desired frame using the rest of the 
-        #orbital elements.
-        position = np.array([r*np.cos(theta), r*np.sin(theta), 0])
-        #use inverse transformation matrix to convert to inertial frame
-        position = np.matmul(self.invTransfMatrix, position)
+        if self.bodyParent != "na":
+            #t is the time since the beginning of the simulation
+            currentMeanAnom = self.n*t + self.meanAnom
+            #calculate eccentric anomaly E
+            E = sp.optimize.newton(self.keplersEquation, np.pi/4, self.keplersDerivative, args=(currentMeanAnom, self.e))
+            #calculate the true anomaly theta
+            theta = 2*np.sqrt((1+self.e)/(1-self.e))*np.tan(E/2)
+            #calculate the heliocentric distance r
+            r = self.a*(1-self.e*np.cos(E))
+            #Now we have r and theta.  Need to convert this to a cartesian vector,
+            #then convert that into the desired frame using the rest of the 
+            #orbital elements.
+            position = np.array([r*np.cos(theta), r*np.sin(theta), 0])
+            #use inverse transformation matrix to convert to inertial frame
+            position = np.matmul(self.invTransfMatrix, position)
+
+        else:
+            position = np.array([0, 0, 0])
 
         return position
 
