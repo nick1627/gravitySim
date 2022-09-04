@@ -13,12 +13,20 @@ class System():
         #get all the planet data as strings
         largeBodyData = np.loadtxt(largeBodyFile, skiprows=1)
 
-
+        #gather a list of the large body objects
         for row in range(len(largeBodyData)):
-            #TODO FINSIH ME!
-            self.largeBodyList.append(body.largeBody(row, largeBodyData[row, 0], largeBodyData[row, 1]))
-
-
+            currentName = largeBodyData[row, 0]
+            currentParent = largeBodyData[row, 1]
+            currentMass = largeBodyData[row, 2]
+            currentRadius = largeBodyData[row, 3]
+            current_e = largeBodyData[row, 4]
+            currentSA = largeBodyData[row, 5]
+            currentInc = largeBodyData[row, 6]
+            currentLAN = largeBodyData[row, 7]
+            currentAP = largeBodyData[row, 8]
+            currentMA = largeBodyData[row, 9]
+     
+            self.largeBodyList.append(body.largeBody(row, currentName, currentParent, currentMass, currentRadius, current_e, currentSA, currentInc, currentLAN, currentAP, currentMA))
 
         self.smallBodyList = smallBodyList
         self.timeStep = timeStep

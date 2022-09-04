@@ -1,4 +1,4 @@
 bodyName, bodyParent, mass, radius, eccentricity, semimajorAxis, inclination, longAscNode, argPeriapsis, meanAnomaly
-kerbol, none, 1.7565459E28, 261600000, na, na, na, na, na, na
-moho, kerbol, 2.5263314E21, 250000, 0.2, 5263138304, 7, 70, 15, 3.14
-eve, kerbol, 1.2243980E23, 700000, 0.01, 9832684544, 2.1, 15, 0, 3.14
+Kerbol, na, 1.7565459E28, 261600000, na, na, na, na, na, na
+Moho, Kerbol, 2.5263314E21, 250000, 0.2, 5263138304, 7, 70, 15, 3.14
+Eve, Kerbol, 1.2243980E23, 700000, 0.01, 9832684544, 2.1, 15, 0, 3.14

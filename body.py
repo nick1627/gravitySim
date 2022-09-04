@@ -111,6 +111,7 @@ class largeBody(Body):
     
 
     def getPosition(self, t):
+        #This function returns the position of the body RELATIVE TO THE PARENT BODY
         if self.bodyParent != "na":
             #t is the time since the beginning of the simulation
             currentMeanAnom = self.n*t + self.meanAnom
